@@ -1,6 +1,6 @@
 {
   "name": "zigbee2mqtt",
-  "version": "1.27.0",
+  "version": "1.18.2",
   "description": "Zigbee to MQTT bridge using Zigbee-herdsman",
   "main": "index.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "git+https://github.com/Koenkk/zigbee2mqtt.git"
   },
   "engines": {
-    "node": "^14 || ^16 || ^18"
+    "node": "^10 || ^12 || ^14 || ^15"
   },
   "keywords": [
     "xiaomi",
@@ -20,11 +20,9 @@
     "cc2531"
   ],
   "scripts": {
-    "build": "tsc && node index.js writehash",
-    "build-watch": "tsc --watch",
-    "eslint": "eslint lib/ --max-warnings=0",
-    "start": "node index.js",
     "test-with-coverage": "jest test --coverage",
+    "eslint": "node_modules/.bin/eslint lib/",
+    "start": "node index.js",
     "test": "jest test",
     "test-watch": "jest test --watch"
   },
@@ -35,57 +33,36 @@
   },
   "homepage": "https://koenkk.github.io/zigbee2mqtt",
   "dependencies": {
-    "ajv": "^8.11.0",
-    "bind-decorator": "^1.0.11",
-    "connect-gzip-static": "2.1.1",
-    "core-js": "^3.24.1",
-    "debounce": "^1.2.1",
-    "deep-object-diff": "^1.1.7",
+    "@node-wot/td-tools": "^0.7.5",
+    "ajv": "^6.12.4",
+    "debounce": "^1.2.0",
+    "deep-object-diff": "^1.1.0",
     "fast-deep-equal": "^3.1.3",
-    "finalhandler": "^1.2.0",
-    "git-last-commit": "^1.0.1",
-    "humanize-duration": "^3.27.2",
-    "js-yaml": "^4.1.0",
-    "json-stable-stringify-without-jsonify": "^1.0.1",
-    "jszip": "^3.10.0",
+    "finalhandler": "^1.1.2",
+    "git-last-commit": "^1.0.0",
+    "humanize-duration": "^3.23.1",
+    "js-yaml": "^3.14.0",
+    "json-stable-stringify-without-jsonify": "=1.0.1",
     "mkdir-recursive": "^0.4.0",
-    "moment": "^2.29.4",
-    "mqtt": "4.3.7",
+    "moment": "^2.27.0",
+    "mqtt": "4.2.1",
     "object-assign-deep": "^0.4.0",
     "rimraf": "^3.0.2",
-    "semver": "^7.3.7",
-    "source-map-support": "^0.5.21",
-    "uri-js": "^4.4.1",
-    "winston": "^3.8.1",
-    "winston-syslog": "^2.6.0",
-    "winston-transport": "^4.5.0",
-    "ws": "^8.8.1",
-    "zigbee-herdsman": "0.14.46",
-    "zigbee-herdsman-converters": "14.0.583",
-    "zigbee2mqtt-frontend": "0.6.107"
+    "semver": "^7.3.2",
+    "serve-static": "^1.14.1",
+    "winston": "^3.3.3",
+    "winston-syslog": "^2.4.4",
+    "ws": "^7.3.1",
+    "zigbee-herdsman": "0.13.88",
+    "zigbee-herdsman-converters": "14.0.102",
+    "zigbee2mqtt-frontend": "0.3.114"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.9",
-    "@babel/plugin-proposal-decorators": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
-    "@babel/preset-typescript": "^7.18.6",
-    "@types/debounce": "^1.2.1",
-    "@types/finalhandler": "^1.1.1",
-    "@types/humanize-duration": "^3.27.1",
-    "@types/jest": "^28.1.6",
-    "@types/js-yaml": "^4.0.5",
-    "@types/object-assign-deep": "^0.4.0",
-    "@types/rimraf": "^3.0.2",
-    "@types/ws": "^8.5.3",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
-    "babel-jest": "^28.1.3",
-    "eslint": "^8.20.0",
-    "eslint-config-google": "^0.14.0",
-    "eslint-plugin-jest": "^26.7.0",
-    "jest": "^28.1.3",
-    "tmp": "^0.2.1",
-    "typescript": "^4.7.4"
+    "eslint": "*",
+    "eslint-config-google": "*",
+    "eslint-plugin-jest": "*",
+    "jest": "*",
+    "tmp": "*"
   },
   "jest": {
     "coverageThreshold": {
@@ -97,8 +74,7 @@
       }
     },
     "collectCoverageFrom": [
-      "lib/**/*.js",
-      "lib/**/*.ts"
+      "lib/**/*.js"
     ]
   },
   "bin": {

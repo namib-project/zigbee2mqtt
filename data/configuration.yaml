@@ -1,6 +1,9 @@
 # Home Assistant integration (MQTT discovery)
 homeassistant: false
 
+# Web of Things integration (MQTT discovery)
+webofthings: true
+
 # allow new devices to join
 permit_join: true
 
