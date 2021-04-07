@@ -6,8 +6,6 @@ const zigbeeHerdsman = require("./stub/zigbeeHerdsman");
 const flushPromises = () => new Promise(setImmediate);
 const MQTT = require("./stub/mqtt");
 const Controller = require("../lib/controller");
-const fs = require("fs");
-const path = require("path");
 const WebOfThings = require("../lib/extension/webofthings");
 const mockExit = jest.spyOn(process, "exit").mockImplementation(() => {});
 const mocksClear = [
@@ -262,9 +260,6 @@ describe("WebOfThings extension", () => {
     it("Should unpublish the thing description of a removed device", async () => {
         controller = new Controller(false);
         await controller.start();
-        const webofthingsmodule = new WebOfThings(null, null, null, null, {
-            on: () => {},
-        });
 
         await flushPromises();
         MQTT.publish.mockClear();
