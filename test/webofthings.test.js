@@ -43,7 +43,7 @@ const thingDescription = {
             forms: [
                 {
                     op: "writeproperty",
-                    href: "zigbee2mqtt/bulb/set/set_transition",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/set/set_transition",
                 },
             ],
         },
@@ -52,7 +52,7 @@ const thingDescription = {
             writeOnly: true,
             forms: [
                 {
-                    href: "zigbee2mqtt/bulb/set/remember_state",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/set/remember_state",
                     op: "writeproperty",
                 },
             ],
@@ -72,12 +72,12 @@ const thingDescription = {
             forms: [
                 {
                     op: ["observeproperty", "unobserveproperty"],
-                    href: "zigbee2mqtt/bulb",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}",
                 },
                 {
                     op: "readproperty",
-                    href: "zigbee2mqtt/bulb/get/state",
-                    "mqv:responseTopic": "zigbee2mqtt/bulb",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/get/state",
+                    "mqv:responseTopic": "zigbee2mqtt/{{FRIENDLY_NAME}}",
                 },
             ],
         },
@@ -100,16 +100,16 @@ const thingDescription = {
             forms: [
                 {
                     op: ["observeproperty", "unobserveproperty"],
-                    href: "zigbee2mqtt/bulb",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}",
                 },
                 {
                     op: ["writeproperty"],
-                    href: "zigbee2mqtt/bulb/set",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/set",
                 },
                 {
                     op: "readproperty",
-                    href: "zigbee2mqtt/bulb/get/state",
-                    "mqv:responseTopic": "zigbee2mqtt/bulb",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/get/state",
+                    "mqv:responseTopic": "zigbee2mqtt/{{FRIENDLY_NAME}}",
                 },
             ],
         },
@@ -127,7 +127,7 @@ const thingDescription = {
             forms: [
                 {
                     op: ["observeproperty", "unobserveproperty"],
-                    href: "zigbee2mqtt/bulb",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}",
                 },
             ],
         },
@@ -141,7 +141,7 @@ const thingDescription = {
             forms: [
                 {
                     op: "invokeaction",
-                    href: "zigbee2mqtt/bulb/set/state",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/set/state",
                 },
             ],
         },
@@ -153,7 +153,7 @@ const thingDescription = {
             forms: [
                 {
                     op: "invokeaction",
-                    href: "zigbee2mqtt/bulb/set/state",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/set/state",
                 },
             ],
         },
@@ -165,7 +165,7 @@ const thingDescription = {
             forms: [
                 {
                     op: "invokeaction",
-                    href: "zigbee2mqtt/bulb/set/state",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/set/state",
                 },
             ],
         },
@@ -182,7 +182,7 @@ const thingDescription = {
             forms: [
                 {
                     op: "invokeaction",
-                    href: "zigbee2mqtt/bulb/set/effect",
+                    href: "zigbee2mqtt/{{FRIENDLY_NAME}}/set/effect",
                 },
             ],
         },
@@ -213,11 +213,67 @@ describe("WebOfThings extension", () => {
         let payload = stringify(thingDescription);
         let brokerAddress = webofthingsmodule.getBrokerAddress();
         payload = payload.replace(/{{MQTT_BROKER_ADDRESS}}/g, brokerAddress);
+        payload = payload.replace(/{{FRIENDLY_NAME}}/g, "bulb");
         await flushPromises();
 
         expect(MQTT.publish).toHaveBeenCalledWith(
             `${wotDiscoveryTopicPrefix}/bulb`,
             payload,
+            { retain: true, qos: 0 },
+            expect.any(Function)
+        );
+    });
+
+    it("Should publish an updated thing description after a rename", async () => {
+        controller = new Controller(false);
+        await controller.start();
+        const webofthingsmodule = new WebOfThings(null, null, null, null, {
+            on: () => {},
+        });
+
+        await flushPromises();
+        MQTT.publish.mockClear();
+        MQTT.events.message(
+            "zigbee2mqtt/bridge/request/device/rename",
+            stringify({ from: "bulb", to: "smartlight" })
+        );
+        await flushPromises();
+
+        let payload = stringify(thingDescription);
+        let brokerAddress = webofthingsmodule.getBrokerAddress();
+        payload = payload.replace(/{{MQTT_BROKER_ADDRESS}}/g, brokerAddress);
+        payload = payload.replace(/{{FRIENDLY_NAME}}/g, "smartlight");
+
+        expect(MQTT.publish).toHaveBeenCalledWith(
+            `${wotDiscoveryTopicPrefix}/bulb`,
+            null,
+            { retain: true, qos: 0 },
+            expect.any(Function)
+        );
+
+        expect(MQTT.publish).toHaveBeenCalledWith(
+            `${wotDiscoveryTopicPrefix}/smartlight`,
+            payload,
+            { retain: true, qos: 0 },
+            expect.any(Function)
+        );
+    });
+
+    it("Should unpublish the thing description of a removed device", async () => {
+        controller = new Controller(false);
+        await controller.start();
+        const webofthingsmodule = new WebOfThings(null, null, null, null, {
+            on: () => {},
+        });
+
+        await flushPromises();
+        MQTT.publish.mockClear();
+        MQTT.events.message("zigbee2mqtt/bridge/config/remove", "bulb");
+        await flushPromises();
+
+        expect(MQTT.publish).toHaveBeenCalledWith(
+            `${wotDiscoveryTopicPrefix}/bulb`,
+            null,
             { retain: true, qos: 0 },
             expect.any(Function)
         );
