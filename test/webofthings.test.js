@@ -28,7 +28,7 @@ const thingDescription = {
     "@type": "ThingModel",
     title: "OSRAM Classic A60 RGBW",
     id: "urn:zigbee2mqtt:0x000b57fffec6a5b2",
-    base: "mqtt://localhost",
+    base: "mqtt://{{MQTT_BROKER_ADDRESS}}",
     securityDefinitions: {
         nosec_sc: {
             scheme: "nosec",
@@ -204,16 +204,20 @@ describe("WebOfThings extension", () => {
     });
 
     it("Should publish thing descriptions to the correct discovery topic", async () => {
-
         controller = new Controller(false);
         await controller.start();
+        const webofthingsmodule = new WebOfThings(null, null, null, null, {
+            on: () => {},
+        });
 
-        let payload = thingDescription;
+        let payload = stringify(thingDescription);
+        let brokerAddress = webofthingsmodule.getBrokerAddress();
+        payload = payload.replace(/{{MQTT_BROKER_ADDRESS}}/g, brokerAddress);
         await flushPromises();
 
         expect(MQTT.publish).toHaveBeenCalledWith(
             `${wotDiscoveryTopicPrefix}/bulb`,
-            stringify(payload),
+            payload,
             { retain: true, qos: 0 },
             expect.any(Function)
         );
