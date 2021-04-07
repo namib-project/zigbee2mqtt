@@ -3,7 +3,7 @@
     "@type": "ThingModel",
     "title": "OSRAM Classic A60 RGBW",
     "id": "urn:zigbee2mqtt:{{IEEE_ADDRESS}}",
-    "base": "mqtt://{{MQTT_BROKER_ADDRESS}}",
+    "base": "{{MQTT_BROKER_SCHEME}}://{{MQTT_BROKER_ADDRESS}}",
     "securityDefinitions": {
         "nosec_sc": {
             "scheme": "nosec"
