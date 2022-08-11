@@ -16,6 +16,7 @@ import ExtensionReceive from './extension/receive';
 import ExtensionNetworkMap from './extension/networkMap';
 import ExtensionSoftReset from './extension/legacy/softReset';
 import ExtensionHomeAssistant from './extension/homeassistant';
+import ExtensionWebOfThings from './extension/webofthings';
 import ExtensionConfigure from './extension/configure';
 import ExtensionDeviceGroupMembership from './extension/legacy/deviceGroupMembership';
 import ExtensionBridgeLegacy from './extension/legacy/bridgeLegacy';
@@ -34,6 +35,7 @@ const AllExtensions = [
     ExtensionConfigure, ExtensionDeviceGroupMembership, ExtensionBridgeLegacy, ExtensionBridge, ExtensionGroups,
     ExtensionBind, ExtensionReport, ExtensionOnEvent, ExtensionOTAUpdate,
     ExtensionExternalConverters, ExtensionFrontend, ExtensionExternalExtension, ExtensionAvailability,
+    ExtensionWebOfThings,
 ];
 
 type ExtensionArgs = [Zigbee, MQTT, State, PublishEntityState, EventBus,
@@ -83,6 +85,8 @@ class Controller {
             settings.get().advanced.legacy_api && new ExtensionBridgeLegacy(...this.extensionArgs),
             settings.get().external_converters.length && new ExtensionExternalConverters(...this.extensionArgs),
             settings.get().homeassistant && new ExtensionHomeAssistant(...this.extensionArgs),
+            // TODO: Should this also depend on the settings?
+            new ExtensionWebOfThings(...this.extensionArgs),
             /* istanbul ignore next */
             settings.get().advanced.soft_reset_timeout !== 0 && new ExtensionSoftReset(...this.extensionArgs),
         ].filter((n) => n);

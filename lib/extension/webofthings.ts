@@ -1,49 +1,48 @@
-const settings = require("../util/settings");
-const logger = require("../util/logger");
-const utils = require("../util/utils");
-const zigbee2mqttVersion = require("../../package.json").version;
-const Extension = require("./extension");
-const stringify = require("json-stable-stringify-without-jsonify");
-const zigbeeHerdsmanConverters = require("zigbee-herdsman-converters");
-const assert = require("assert");
-const fs = require("fs");
-const os = require("os");
+import settings from "../util/settings";
+import logger from "../util/logger";
+import utils from "../util/utils";
+import Extension from "./extension";
+import stringify from "json-stable-stringify-without-jsonify";
+import zigbeeHerdsmanConverters from "zigbee-herdsman-converters";
+import assert from "assert";
+import fs from "fs";
+import os from "os";
 
 const wotDiscoveryTopicPrefix = "wot/td";
 
 /**
  * This extensions handles integration with the Web of Things
  */
-class WebOfThings {
-    constructor(zigbee, mqtt, state, publishEntityState, eventBus, settings, logger) {
-        this.zigbee = zigbee;
-        this.mqtt = mqtt;
-        this.state = state;
-        this.publishEntityState = publishEntityState;
-        this.eventBus = eventBus;
-        this.settings = settings;
-        this.logger = logger;
+ export default class WebOfThings extends Extension {
+    devices = {};
+
+    constructor(zigbee: Zigbee, mqtt: MQTT, state: State, publishEntityState: PublishEntityState,
+        eventBus: EventBus, enableDisableExtension: (enable: boolean, name: string) => Promise<void>,
+        restartCallback: () => void, addExtension: (extension: Extension) => Promise<void>) {
+        super(zigbee, mqtt, state, publishEntityState, eventBus, enableDisableExtension, restartCallback, addExtension);
 
         this.devices = {};
     }
 
-    start () {
+    override start(): Promise<void> {
         this.eventBus.onDeviceRemoved(this,
-            (data) => this.onDeviceRemoved(data.resolvedEntity),
+            (data: eventdata.DeviceRemoved) => this.onDeviceRemoved(data),
         );
-        this.eventBus.onPublishEntityState(
+        this.eventBus.onPublishEntityState(this,
             (data) => this.onPublishEntityState(data.entity),
         );
-        this.eventBus.onDeviceRenamed(
+        this.eventBus.onEntityRenamed(this,
             (device) => this.onDeviceRenamed(device),
         );
+
+        return;
     }
 
-    onDeviceRemoved(resolvedEntity) {
+    onDeviceRemoved(data: eventdata.DeviceRemoved) {
         logger.debug(
             `Clearing Web of Things discovery topic for '${resolvedEntity.name}'`
         );
-        let ieeeAddr = resolvedEntity.device.ieeeAddr;
+        let ieeeAddr = data.ieeeAddr;
         let friendlyName = this.devices[ieeeAddr].friendlyName;
         delete this.devices[ieeeAddr];
         this.removeDevice(friendlyName);
@@ -166,5 +165,3 @@ class WebOfThings {
         return `${config.type}/${device.ieeeAddr}/${config.object_id}/config`;
     }
 }
-
-module.exports = WebOfThings;
