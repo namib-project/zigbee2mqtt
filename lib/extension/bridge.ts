@@ -310,13 +310,13 @@ export default class Bridge extends Extension {
         return utils.getResponse(message, {value}, null);
     }
 
-    @bind configWebOfThings(message: string | KeyValue): Promise<MQTTResponse> {
+    @bind async configWebOfThings(message: string | KeyValue): Promise<MQTTResponse> {
         const allowed = [true, false];
         const value = this.getValue(message);
         if (typeof value !== 'boolean' || !allowed.includes(value)) {
             throw new Error(`'${value}' is not an allowed value, allowed: ${allowed}`);
         }
-        this.enableDisableExtension(value, 'WebOfThings');
+        await this.enableDisableExtension(value, 'WebOfThings');
         settings.set(['webofthings'], value);
         this.publishInfo();
         return utils.getResponse(message, {value}, null);
