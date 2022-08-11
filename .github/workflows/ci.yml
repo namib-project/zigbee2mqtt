@@ -33,7 +33,7 @@ jobs:
       run: echo ${{ secrets.DOCKER_KEY }} | docker login -u koenkk --password-stdin
     - name: Docker setup - QEMU
       if: (github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/')) && github.event_name == 'push'
-      uses: docker/setup-qemu-action@v1
+      uses: docker/setup-qemu-action@v2
       with:
         platforms: all
     - name: Docker setup - Buildx
