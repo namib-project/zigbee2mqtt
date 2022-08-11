@@ -310,7 +310,7 @@ export default class Bridge extends Extension {
         return utils.getResponse(message, {value}, null);
     }
 
-    @bind configWebOfThings(message: string | KeyValue) {
+    @bind configWebOfThings(message: string | KeyValue): Promise<MQTTResponse> {
         const allowed = [true, false];
         const value = this.getValue(message);
         if (typeof value !== 'boolean' || !allowed.includes(value)) {
