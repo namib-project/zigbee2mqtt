@@ -6,7 +6,7 @@ const zigbeeHerdsman = require("./stub/zigbeeHerdsman");
 const flushPromises = () => new Promise(setImmediate);
 const MQTT = require("./stub/mqtt");
 const Controller = require("../lib/controller");
-const WebOfThings = require("../lib/extension/webofthings");
+const os = require("os");
 const mockExit = jest.spyOn(process, "exit").mockImplementation(() => {});
 const mocksClear = [
     zigbeeHerdsman.permitJoin,
@@ -25,6 +25,36 @@ const thingDescription = require("./assets/mock-web-of-things")
 const wotDiscoveryTopicPrefix = "wot/td";
 let controller;
 
+// TODO: Clean this up
+function getBrokerAddress() {
+    const configAddress = settings.get().mqtt.server.split('://')[1];
+
+    // There might be a more elegant way to do this
+    if (configAddress == 'localhost' || configAddress == '127.0.0.1') {
+        return getLocalAddress('IPv4');
+    } else if (configAddress == '::1') {
+        return `[${getLocalAddress('IPv6')}]`;
+    }
+
+    return configAddress;
+}
+
+function getLocalAddress(family) {
+    const interfaces = os.networkInterfaces();
+    let address;
+    Object.keys(interfaces).forEach((ifname) => {
+        interfaces[ifname].forEach((iface) => {
+            if (family !== iface.family || iface.internal !== false) {
+                return;
+            }
+            address = iface.address;
+            return;
+        });
+    });
+
+    return address;
+}
+
 describe("WebOfThings extension", () => {
     beforeEach(() => {
         zigbeeHerdsman.returnDevices.splice(0);
@@ -39,12 +69,9 @@ describe("WebOfThings extension", () => {
     it("Should publish thing descriptions to the correct discovery topic", async () => {
         controller = new Controller(false);
         await controller.start();
-        const webofthingsmodule = new WebOfThings(null, null, null, null, {
-            on: () => {},
-        });
 
         let payload = stringify(thingDescription);
-        const brokerAddress = webofthingsmodule.getBrokerAddress();
+        const brokerAddress = getBrokerAddress();
         payload = payload.replace(/{{MQTT_BROKER_ADDRESS}}/g, brokerAddress);
         payload = payload.replace(/{{FRIENDLY_NAME}}/g, "bulb");
         await flushPromises();
@@ -60,9 +87,6 @@ describe("WebOfThings extension", () => {
     it("Should publish an updated thing description after a rename", async () => {
         controller = new Controller(false);
         await controller.start();
-        const webofthingsmodule = new WebOfThings(null, null, null, null, {
-            on: () => {},
-        });
 
         await flushPromises();
         MQTT.publish.mockClear();
@@ -73,7 +97,7 @@ describe("WebOfThings extension", () => {
         await flushPromises();
 
         let payload = stringify(thingDescription);
-        const brokerAddress = webofthingsmodule.getBrokerAddress();
+        const brokerAddress = getBrokerAddress();
         payload = payload.replace(/{{MQTT_BROKER_ADDRESS}}/g, brokerAddress);
         payload = payload.replace(/{{FRIENDLY_NAME}}/g, "smartlight");
 
