@@ -86,7 +86,7 @@ class Controller {
             settings.get().external_converters.length && new ExtensionExternalConverters(...this.extensionArgs),
             settings.get().homeassistant && new ExtensionHomeAssistant(...this.extensionArgs),
             // TODO: Should this also depend on the settings?
-            new ExtensionWebOfThings(...this.extensionArgs),
+            settings.get().webofthings && new ExtensionWebOfThings(...this.extensionArgs),
             /* istanbul ignore next */
             settings.get().advanced.soft_reset_timeout !== 0 && new ExtensionSoftReset(...this.extensionArgs),
         ].filter((n) => n);

@@ -166,6 +166,7 @@ declare global {
     // Settings
     // eslint-disable camelcase
     interface Settings {
+        webofthings?: boolean,
         homeassistant?: {
             discovery_topic: string,
             status_topic: string,
