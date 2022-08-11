@@ -269,8 +269,14 @@ export default class Publish extends Extension {
 
                     this.legacyRetrieveState(re, converter, result, localTarget, key, meta);
                 } else if (parsedTopic.type === 'get' && converter.convertGet) {
-                    logger.debug(`Publishing get '${parsedTopic.type}' '${key}' to '${re.name}'`);
-                    await converter.convertGet(localTarget, key, meta);
+                    let propertyToGet;
+                    if (parsedTopic.attribute) {
+                        propertyToGet = parsedTopic.attribute;
+                    } else {
+                        propertyToGet = key;
+                    }
+                    logger.debug(`Publishing get '${parsedTopic.type}' '${propertyToGet}' to '${re.name}'`);
+                    await converter.convertGet(localTarget, propertyToGet, meta);
                 } else {
                     logger.error(`No converter available for '${parsedTopic.type}' '${key}' (${message[key]})`);
                     continue;

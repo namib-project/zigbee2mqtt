@@ -47,6 +47,7 @@ export default class Bridge extends Extension {
             'touchlink/scan': this.touchlinkScan,
             'health_check': this.healthCheck,
             'options': this.bridgeOptions,
+            'config/webofthings': this.configWebOfThings,
             // Below are deprecated
             'config/last_seen': this.configLastSeen,
             'config/homeassistant': this.configHomeAssistant,
@@ -305,6 +306,18 @@ export default class Bridge extends Extension {
 
         await this.enableDisableExtension(value, 'HomeAssistant');
         settings.set(['homeassistant'], value);
+        this.publishInfo();
+        return utils.getResponse(message, {value}, null);
+    }
+
+    @bind configWebOfThings(message: string | KeyValue) {
+        const allowed = [true, false];
+        const value = this.getValue(message);
+        if (typeof value !== 'boolean' || !allowed.includes(value)) {
+            throw new Error(`'${value}' is not an allowed value, allowed: ${allowed}`);
+        }
+        this.enableDisableExtension(value, 'WebOfThings');
+        settings.set(['webofthings'], value);
         this.publishInfo();
         return utils.getResponse(message, {value}, null);
     }
