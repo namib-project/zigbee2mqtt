@@ -23,6 +23,7 @@ const mocksClear = [
 
 const thingDescription = require("./assets/mock-web-of-things")
 const wotDiscoveryTopicPrefix = "wot/td";
+let controller;
 
 describe("WebOfThings extension", () => {
     beforeEach(() => {
@@ -43,7 +44,7 @@ describe("WebOfThings extension", () => {
         });
 
         let payload = stringify(thingDescription);
-        let brokerAddress = webofthingsmodule.getBrokerAddress();
+        const brokerAddress = webofthingsmodule.getBrokerAddress();
         payload = payload.replace(/{{MQTT_BROKER_ADDRESS}}/g, brokerAddress);
         payload = payload.replace(/{{FRIENDLY_NAME}}/g, "bulb");
         await flushPromises();
