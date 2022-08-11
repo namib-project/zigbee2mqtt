@@ -25,7 +25,7 @@ const thingDescription = require("./assets/mock-web-of-things")
 const wotDiscoveryTopicPrefix = "wot/td";
 
 describe("WebOfThings extension", () => {
-    beforeEach(async () => {
+    beforeEach(() => {
         zigbeeHerdsman.returnDevices.splice(0);
         controller = new Controller();
         mocksClear.forEach((m) => m.mockClear());
@@ -72,7 +72,7 @@ describe("WebOfThings extension", () => {
         await flushPromises();
 
         let payload = stringify(thingDescription);
-        let brokerAddress = webofthingsmodule.getBrokerAddress();
+        const brokerAddress = webofthingsmodule.getBrokerAddress();
         payload = payload.replace(/{{MQTT_BROKER_ADDRESS}}/g, brokerAddress);
         payload = payload.replace(/{{FRIENDLY_NAME}}/g, "smartlight");
 
